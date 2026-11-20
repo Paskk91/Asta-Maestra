@@ -77,3 +77,6 @@ grant execute on function public.asta_sync_push(jsonb, bigint, text) to authenti
 
 -- La tabella non espone DELETE: la rimozione avviene solo con cascata
 -- eliminando l'account, come previsto dalla policy di ritenzione minima.
+
+-- Ricarica il cache di PostgREST per esporre subito tabella e funzione.
+notify pgrst, 'reload schema';
