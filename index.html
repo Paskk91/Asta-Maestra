@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080C14">
+<meta name="description" content="Asta Maestra — console d'asta per il fantacalcio: listone, regia, budget, audit e backup. I tuoi dati restano nel browser.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Asta Maestra">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Asta Maestra">
+<meta property="og:description" content="La console d'asta per il fantacalcio, su tutti i tuoi dispositivi.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<title>Asta Maestra — Tactical console per l'asta del fantacalcio</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+<div id="glowA"></div><div id="glowB"></div>
+
+<nav id="navEl">
+  <div class="nav-in">
+    <a class="brand" href="#dashboard"><span class="brand-mark" data-ico="gavel" data-ico-size="18"></span>
+      <span><span class="brand-name">ASTA <em>MAESTRA</em></span><span class="brand-tag">tactical console</span></span></a>
+    <a class="league-chip" href="#lega"><span data-ico="verified" data-ico-size="14"></span><span id="leagueChipName">Lega</span></a>
+    <div class="nav-links">
+      <a href="#listone" data-spy-link="listone"><span data-ico="file" data-ico-size="14"></span>Listone</a>
+      <a href="#mercato" data-spy-link="mercato"><span data-ico="gavel" data-ico-size="14"></span>Mercato</a>
+      <a href="#rosa" data-spy-link="rosa"><span data-ico="shirt" data-ico-size="14"></span>Rosa</a>
+      <a href="#regia" data-spy-link="regia"><span data-ico="radar" data-ico-size="14"></span>Regia</a>
+      <a href="#lega" data-spy-link="lega"><span data-ico="users" data-ico-size="14"></span>Lega</a>
+      <a href="#analisi" data-spy-link="analisi"><span data-ico="chart" data-ico-size="14"></span>Analisi</a>
+      <a href="#sistema" data-spy-link="sistema"><span data-ico="shield" data-ico-size="14"></span>Sistema</a>
+    </div>
+    <div class="nav-right">
+      <a class="health-chip ok" id="healthChip" href="#sistema"><span data-ico="shield" data-ico-size="13"></span><span id="healthTxt">Asta OK</span></a>
+      <button type="button" class="btn-icon" id="backupBtn" data-action="backup-now" aria-label="Scarica subito un backup completo" title="Backup immediato"><span data-ico="download" data-ico-size="16"></span></button>
+      <button type="button" class="btn-icon on" id="soundBtn" data-action="sound" aria-label="Attiva o disattiva audio"></button>
+      <button type="button" class="btn-icon" id="presentBtn" data-action="present-toggle" aria-label="Apri la modalità presentazione a schermo intero" title="Modalità presentazione (P)"><span data-ico="chart" data-ico-size="16"></span></button>
+      <span class="budget-pill" id="budgetPill" aria-live="polite" title="Budget residuo"><span data-ico="coin" data-ico-size="14"></span><span id="navBudget" data-v="0">0</span><small>CR</small></span>
+    </div>
+  </div>
+</nav>
+
+<div class="guard" id="guardBanner"></div>
+
+<div class="console" id="consoleEl">
+  <div class="console-in">
+    <div class="c-grid">
+      <button type="button" class="timer-btn c-timer" id="timerBtn" data-action="timer-toggle" aria-label="Avvia o metti in pausa il timer chiamata" title="Timer chiamata (T)">
+        <svg width="48" height="48" viewBox="0 0 48 48"><circle class="tr-bg" cx="24" cy="24" r="20" fill="none" stroke-width="3"/>
+        <circle class="tr-fg" id="timerRing" cx="24" cy="24" r="20" fill="none" stroke-width="3" stroke-dasharray="125.6" stroke-dashoffset="0"/></svg>
+        <span id="timerTxt">30</span>
+      </button>
+      <div class="c-player">
+        <div class="c-search-wrap" id="callSearchWrap">
+          <span data-ico="search" data-ico-size="16"></span>
+          <input type="text" class="inp" id="callSearch" placeholder="In attesa del listone…" autocomplete="off" spellcheck="false" aria-label="Cerca un giocatore da chiamare" disabled>
+          <div class="c-suggest" id="callSuggest" role="listbox" aria-label="Risultati ricerca"></div>
+        </div>
+        <div class="c-selected" id="callSelected" hidden></div>
+      </div>
+      <div class="c-price">
+        <button type="button" class="btn-icon" data-action="call-step" data-d="-1" aria-label="Riduci il prezzo di 1"><span data-ico="minus" data-ico-size="15"></span></button>
+        <input type="text" id="callPrice" inputmode="numeric" value="0" aria-label="Prezzo della chiamata">
+        <button type="button" class="btn-icon" data-action="call-step" data-d="1" aria-label="Aumenta il prezzo di 1"><span data-ico="plus" data-ico-size="15"></span></button>
+      </div>
+      <div class="c-inc">
+        <button type="button" class="inc-chip" data-action="call-step" data-d="1">+1</button>
+        <button type="button" class="inc-chip" data-action="call-step" data-d="2">+2</button>
+        <button type="button" class="inc-chip" data-action="call-step" data-d="5">+5</button>
+        <button type="button" class="inc-chip" data-action="call-step" data-d="10">+10</button>
+      </div>
+      <div class="c-quick" id="callQuick"></div>
+      <button type="button" class="btn btn-gold c-buy" id="callBuy" data-action="call-buy" disabled><span data-ico="gavel" data-ico-size="15"></span><span id="callBuyLabel">AGGIUDICA</span></button>
+      <button type="button" class="btn-icon c-undo" id="undoBtn" data-action="undo" aria-label="Annulla l'ultima operazione" title="Annulla (Ctrl+Z)" style="display:none"><span data-ico="undo" data-ico-size="15"></span></button>
+      <div class="c-tools">
+        <button type="button" class="btn-icon" id="undoBtn2" data-action="undo" aria-label="Annulla l'ultima operazione" title="Annulla (Ctrl+Z)"><span data-ico="undo" data-ico-size="15"></span></button>
+        <button type="button" class="btn-icon" id="redoBtn" data-action="redo" aria-label="Ripristina l'operazione annullata" title="Ripristina (Ctrl+Y)"><span data-ico="redo" data-ico-size="15"></span></button>
+        <button type="button" class="btn-icon" data-action="shortcuts" aria-label="Mostra le scorciatoie da tastiera" title="Scorciatoie"><span data-ico="keyboard" data-ico-size="15"></span></button>
+        <button type="button" class="btn-icon" data-action="present-toggle" aria-label="Modalità presentazione" title="Presentazione (F)"><span data-ico="chart" data-ico-size="15"></span></button>
+      </div>
+      <div class="c-teamwrap">
+        <span class="c-label">Aggiudica a</span>
+        <div class="c-teamchips" id="callTeams" role="group" aria-label="Squadra di destinazione"></div>
+      </div>
+      <span class="c-pulse" id="cPulse"></span>
+      <span class="c-hint" id="callHint"></span>
+    </div>
+  </div>
+</div>
+
+<main>
+<div class="print-only container"><h1 id="printTitle">Report asta</h1><p id="printMeta"></p></div>
+
+<section id="dashboard" data-spy>
+  <div class="container hero">
+    <div class="hero-grid">
+      <div>
+        <div class="sec-eyebrow reveal" style="--i:0"><span class="ping"></span> <span id="heroLeague">LEGA</span> <i></i> <span id="heroState">TAVOLO IN PREPARAZIONE</span></div>
+        <h1 class="reveal" style="--i:1">CHIAMA. <span class="g">AGGIUDICA.</span><br><span class="m">VINCI LA LEGA.</span></h1>
+        <p class="hero-sub reveal" style="--i:2">Console d'asta a prova di errore: salvataggio ridondante, time machine, audit di coerenza e suggerimenti per reparto che leggono la tua rosa e le mosse dei rivali in tempo reale.</p>
+        <div class="name-row reveal" style="--i:3">
+          <span class="name-field">Lega <input type="text" id="leagueNameInput" data-change="leagueName" maxlength="34" placeholder="Nome lega" aria-label="Nome della lega"></span>
+          <span class="name-field">Squadra <input type="text" id="myNameInput" data-change="myName" maxlength="30" placeholder="Nome squadra" aria-label="Nome della mia squadra"></span>
+        </div>
+        <div class="hero-cta reveal" style="--i:4" id="heroCta"></div>
+        <p class="hero-status reveal" style="--i:4" id="heroStatus"></p>
+      </div>
+      <div class="card mgr hot reveal" style="--i:3" id="managerCard"></div>
+    </div>
+    <div class="card first-steps reveal hidden" id="firstStepsCard" style="--i:4">
+      <div class="card-h"><span class="ico" data-ico="sparkles"></span><h3>Primi passi</h3>
+        <span class="chip st-2 mla" id="firstStepsCount">0/2</span></div>
+      <div class="card-b"><div class="steps-row">
+        <button type="button" class="step-item" id="stepNames" data-action="firststeps-names">
+          <span class="step-n">1</span><span><b>Imposta i nomi</b><small>Lega e squadra, ovunque nella console.</small></span></button>
+        <button type="button" class="step-item" id="stepImport" data-action="firststeps-import">
+          <span class="step-n">2</span><span><b>Carica il listone</b><small>XLSX, CSV o incolla il testo.</small></span></button>
+        <a class="step-item" href="#sistema">
+          <span class="step-n">3</span><span><b>Checklist pre-asta</b><small>Verifica che tutto sia pronto.</small></span></a>
+        <button type="button" class="link-btn mla" data-action="firststeps-hide">Nascondi</button>
+      </div></div>
+    </div>
+    <div class="card pulse-card reveal hidden" id="pulseCard" style="--i:5">
+      <div class="card-h"><span class="ico" data-ico="trend" data-ico-size="16"></span>
+        <b>Come sta andando la tua asta</b><span class="pulse-badge" id="pulseBadge">—</span>
+        <button type="button" class="link-btn mla" data-action="pulse-hide">Nascondi</button></div>
+      <div class="card-b"><p class="pulse-advice" id="pulseAdvice"></p>
+        <div class="pulse-bars">
+          <div class="pulse-bar"><span>Budget</span><i><b id="pulseBudgetBar"></b></i><em id="pulseBudgetTxt">0%</em></div>
+          <div class="pulse-bar"><span>Rosa</span><i><b id="pulseRosaBar"></b></i><em id="pulseRosaTxt">0%</em></div>
+        </div>
+        <div class="pulse-roles" id="pulseRoles"></div>
+        <p class="pulse-foot" id="pulseFoot"></p>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="card kpi reveal" style="--i:5;--kc:var(--neon)">
+        <div class="k-label"><span data-ico="coin" data-ico-size="12"></span>Budget</div>
+        <div class="k-val"><span id="kpiBudget" data-v="0">0</span> <small>cr</small></div>
+        <div class="k-sub">di <span id="kpiBudgetTot">500</span> · speso <span id="kpiSpent" data-v="0">0</span></div>
+      </div>
+      <div class="card kpi reveal" style="--i:6;--kc:var(--roleC)">
+        <div class="k-label"><span data-ico="shirt" data-ico-size="12"></span>Rosa</div>
+        <div class="kpi-flex"><div class="ring-wrap">
+          <svg width="56" height="56" viewBox="0 0 56 56"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#38BDF8"/><stop offset="1" stop-color="#00FF87"/></linearGradient></defs>
+            <circle class="ring-bg" cx="28" cy="28" r="23" fill="none" stroke-width="5"/>
+            <circle class="ring-fg" id="kpiRing" cx="28" cy="28" r="23" fill="none" stroke-width="5" stroke-dasharray="144.5" stroke-dashoffset="144.5"/></svg>
+          <span class="ring-txt" id="kpiSlots">0/25</span></div><div class="pips" id="rolePips"></div></div>
+      </div>
+      <div class="card kpi reveal" style="--i:7;--kc:var(--cyan)">
+        <div class="k-label"><span data-ico="crown" data-ico-size="12"></span>Potenza</div>
+        <div class="k-val"><span id="kpiPower">0</span><small>/100</small></div>
+        <div class="k-sub" id="kpiPowerSub">media lega —</div>
+      </div>
+      <div class="card kpi reveal" style="--i:8;--kc:var(--warn)">
+        <div class="k-label"><span data-ico="gavel" data-ico-size="12"></span>Tetto</div>
+        <div class="k-val"><span id="kpiMax">0</span> <small>cr</small></div>
+        <div class="k-sub" id="kpiMaxSub">max chiamata</div>
+      </div>
+      <div class="card kpi reveal" style="--i:9;--kc:var(--flare)">
+        <div class="k-label"><span data-ico="trend" data-ico-size="12"></span>Inflazione</div>
+        <div class="k-val"><span id="kpiInfl">100</span><small>%</small></div>
+        <div class="k-sub" id="kpiInflSub">in attesa di chiamate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="listone" data-spy>
+  <div class="container">
+    <div class="sec-head reveal">
+      <div><div class="sec-eyebrow"><b>01</b><i></i>FILE UFFICIALE FANTACALCIO</div><h2 id="listoneTitle">IMPORTA IL <span>LISTONE</span></h2></div>
+      <p class="sec-sub" id="listoneSub">Carica il file XLSX delle quotazioni: l'app riconosce fogli, intestazione e colonne, poi ti mostra l'anteprima prima di confermare. Il file resta nel tuo browser.</p>
+    </div>
+    <div class="card compact-listone reveal" id="compactListone" style="--i:1"></div>
+    <div class="import-grid import-full" id="importFull">
+      <div class="card hot reveal" style="--i:1">
+        <div class="card-h"><span class="ico" data-ico="file"></span><h3>File listone</h3>
+          <span class="mla chip st-2" id="importState">vuoto</span></div>
+        <div class="card-b">
+          <div class="dropzone" id="dropzone" data-action="choose" role="button" tabindex="0" aria-label="Carica il file XLSX o CSV del listone">
+            <div id="dzInner">
+              <div class="dz-ico" data-ico="upload" data-ico-size="30"></div>
+              <h4>Trascina qui il listone</h4>
+              <p>Quotazioni_Fantacalcio_Stagione_2026_27.xlsx · oppure clicca</p>
+              <div class="fmt-badges"><span class="fmt">XLSX</span><span class="fmt csv">CSV</span></div>
+            </div>
+          </div>
+          <input type="file" id="fileInput" accept=".xlsx,.xlsm,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" class="sr-only" aria-label="File del listone">
+          <div class="upload-actions">
+            <button type="button" class="btn btn-gold btn-sm" data-action="choose"><span data-ico="upload" data-ico-size="14"></span>Scegli file XLSX</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="template"><span data-ico="download" data-ico-size="14"></span>Template CSV</button>
+          </div>
+          <div class="paste-csv">
+            <button type="button" class="link-btn" data-action="toggle-paste" id="pasteToggle">Incolla il testo del CSV</button>
+            <div class="paste-box hidden" id="pasteBox">
+              <textarea class="inp" id="pasteCsv" rows="5" placeholder="Id,R,RM,Nome,Squadra,Qt.A,Qt.I,Diff.,FVM&#10;1,P,Por,Esempio Portiere,Squadra A,17,9,8,64" aria-label="Incolla il testo del listone CSV"></textarea>
+              <div class="data-actions mt10">
+                <button type="button" class="btn btn-gold btn-sm" data-action="paste-import"><span data-ico="wand" data-ico-size="14"></span>Analizza il testo</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-action="paste-clear">Svuota</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-action="template"><span data-ico="download" data-ico-size="14"></span>Template</button>
+              </div>
+              <p class="csv-note">Il testo resta nel browser: viene interpretato come CSV e passa dalla stessa anteprima del caricamento da file.</p>
+            </div>
+          </div>
+          <div id="importErrorFull"></div>
+          <p class="csv-note">Import sicuro: il file viene letto in locale nel browser e non viene inviato a nessun server.</p>
+          <p class="csv-note">Lettura nativa del file Fantacalcio: foglio <b>Tutti</b>, intestazione alla riga 2, blocchi di titolo ripetuti ignorati, colonne <b>Id · R · RM · Nome · Squadra · Qt.A · Qt.I · Diff. · FVM</b>. Il foglio <b>Ceduti</b> è escluso per impostazione predefinita.</p>
+        </div>
+      </div>
+      <div>
+        <div class="mb14 card reveal" style="--i:2">
+          <div class="card-h"><span class="ico" data-ico="info"></span><h3>Come funziona</h3></div>
+          <div class="card-b"><div class="how-steps">
+            <div class="how-step"><span class="hn">01</span><span><b>Scarica il file</b><small>Usa il listone ufficiale Fantacalcio in XLSX, oppure parti dal template CSV.</small></span></div>
+            <div class="how-step"><span class="hn">02</span><span><b>Trascinalo qui</b><small>Riconosciamo il foglio Tutti, l'intestazione e i blocchi di titolo ripetuti.</small></span></div>
+            <div class="how-step"><span class="hn">03</span><span><b>Controlla e importa</b><small>L'anteprima mostra ruoli, quotazioni e FVM prima di confermare.</small></span></div>
+          </div></div>
+        </div>
+        <div class="card reveal" style="--i:3">
+          <div class="card-h"><span class="ico" data-ico="grid"></span><h3>Colonne lette</h3></div>
+          <div class="card-b">
+            <div class="col-pills"><span class="req">Nome</span><span class="req">Ruolo</span><span>Squadra</span><span>Qt.A</span><span>Qt.I</span><span>Diff.</span><span>FVM</span><span>Id</span><span>Mantra</span></div>
+            <p class="csv-note">Servono almeno Nome e Ruolo; le altre colonne vengono ricostruite o mappate nell'anteprima. Puoi anche unire più fogli e includere i ceduti.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="mercato" data-spy>
+  <div class="container">
+    <div class="sec-head reveal">
+      <div><div class="sec-eyebrow"><b>02</b><i></i>TAVOLO DELLE CHIAMATE</div><h2>IL <span>MERCATO</span></h2></div>
+      <p class="sec-sub">Ricerca tollerante ai refusi: prova anche solo le iniziali o una parte del nome. Il prezzo equo si aggiorna a ogni acquisto sul budget residuo della lega.</p>
+    </div>
+    <div class="market-grid">
+      <div class="reveal" style="--i:1">
+        <div class="views-row" id="viewsRow">
+          <span class="save-view-form" id="saveViewForm">
+            <input type="text" class="inp" id="saveViewName" placeholder="Nome vista…" maxlength="24" aria-label="Nome della vista">
+            <button type="button" class="btn btn-gold btn-sm" data-action="view-save-ok">OK</button>
+            <button type="button" class="btn-icon" data-action="view-save-close" aria-label="Chiudi salvataggio vista"><span data-ico="x" data-ico-size="13"></span></button>
+          </span>
+        </div>
+        <div class="toolbar">
+          <div class="search-wrap"><span data-ico="search" data-ico-size="16"></span>
+            <input type="text" class="inp" id="searchInput" placeholder="Filtra per nome o club…" spellcheck="false" aria-label="Filtra il listone"></div>
+          <div class="role-seg" id="roleSeg" role="group" aria-label="Filtra per ruolo"></div>
+          <div class="field"><label for="teamFilter">Club</label><select class="inp" id="teamFilter" data-change="f-team"></select></div>
+          <div class="field"><label for="mantraFilter">Mantra</label><select class="inp" id="mantraFilter" data-change="f-mantra"></select></div>
+          <div class="field"><label for="marketFilter">Mercato</label><select class="inp" id="marketFilter" data-change="f-market">
+            <option value="free">Liberi</option><option value="sold">Acquistati</option><option value="all">Tutti</option></select></div>
+          <div class="field"><label for="sortSelect">Ordina</label><select class="inp" id="sortSelect" data-change="f-sort">
+            <option value="value">Indice</option><option value="fair">Prezzo equo</option><option value="bid">Bid consigliato</option>
+            <option value="fvm">FVM</option><option value="qt">Qt.A</option><option value="diff">Trend</option><option value="name">Nome</option></select></div>
+          <button type="button" class="btn-icon" id="sortDirBtn" data-action="sort-dir" aria-label="Inverti l'ordinamento" title="Inverti ordinamento"></button>
+          <label class="toggle-inline"><span class="switch"><input type="checkbox" id="affariToggle" data-change="f-affari" aria-label="Mostra solo gli affari"><span class="track"></span></span>Solo affari</label>
+        </div>
+        <div class="bulk-bar" id="bulkBar">
+          <span><b id="bulkCount">0</b> selezionati</span>
+          <select class="inp" id="bulkTeam" aria-label="Squadra di destinazione"></select>
+          <button type="button" class="btn btn-gold btn-sm" data-action="bulk-assign"><span data-ico="gavel" data-ico-size="14"></span>Assegna a quotazione</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-action="bulk-plan"><span data-ico="star" data-ico-size="14"></span>Al radar</button>
+          <button type="button" class="btn-icon" data-action="bulk-clear" aria-label="Annulla la selezione"><span data-ico="x" data-ico-size="14"></span></button>
+        </div>
+        <div class="card table-card">
+          <div class="table-wrap">
+            <table class="market">
+              <thead><tr>
+                <th><input type="checkbox" id="selectAll" data-change="sel-all" aria-label="Seleziona tutti i giocatori visibili"></th>
+                <th>R</th>
+                <th class="sortable" data-action="sort" data-sort="name">Giocatore<span class="arr"></span></th>
+                <th class="sortable ta-r" data-action="sort" data-sort="qt">Qt.A<span class="arr"></span></th>
+                <th class="sortable ta-r col-diff" data-action="sort" data-sort="diff">Δ<span class="arr"></span></th>
+                <th class="sortable ta-r" data-action="sort" data-sort="fvm">FVM<span class="arr"></span></th>
+                <th class="sortable ta-r col-idx" data-action="sort" data-sort="value">Indice<span class="arr"></span></th>
+                <th class="sortable ta-r" data-action="sort" data-sort="fair">Equo<span class="arr"></span></th>
+                <th class="sortable ta-r" data-action="sort" data-sort="bid">Bid<span class="arr"></span></th>
+                <th class="tar">Azioni</th>
+              </tr></thead>
+              <tbody id="marketBody"></tbody>
+            </table>
+          </div>
+          <div class="cards-wrap" id="marketCards"></div>
+          <div class="table-foot"><span class="cnt" id="marketCount"></span>
+            <button type="button" class="btn btn-ghost btn-sm" id="moreBtn" data-action="more">Mostra altri 60</button></div>
+        </div>
+      </div>
+      <aside class="rail">
+        <div class="card reveal" style="--i:2"><div class="card-h"><span class="ico" data-ico="sparkles"></span><h3>Il regista</h3>
+          <a class="mla link-btn" href="#regia">Regia</a></div>
+          <div class="card-b" id="advisorCard"></div></div>
+        <div class="card reveal" style="--i:3"><div class="card-h"><span class="ico" data-ico="history"></span><h3>Ultime chiamate</h3></div>
+          <div class="card-b" id="recentCard"></div></div>
+        <div class="card reveal" style="--i:4"><div class="card-h"><span class="ico" data-ico="radar"></span><h3>Radar obiettivi</h3>
+          <span class="mla chip st-1" id="planCount">0</span></div>
+          <div class="card-b" id="planCard"></div></div>
+        <div class="card reveal" style="--i:5"><div class="card-h"><span class="ico" data-ico="clock"></span><h3>Tabellone</h3>
+          <span class="mla pad38 chip st-0"><span class="ping"></span>Live</span></div>
+          <div class="card-b"><div class="log-list" id="logList"></div></div></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section id="rosa" data-spy>
+  <div class="container">
+    <div class="sec-head reveal">
+      <div><div class="sec-eyebrow"><b>03</b><i></i>3 PORTIERI · 8 DIFENSORI · 8 CENTROCAMPISTI · 6 ATTACCANTI</div><h2>LA MIA <span>ROSA</span></h2></div>
+      <div class="rosa-head-tools">
+        <span class="rosa-totals" id="rosaTotals"></span>
+        <div class="field"><label for="formationSelect">Modulo</label><select class="inp" id="formationSelect" data-change="formation"></select></div>
+        <button type="button" class="btn btn-ghost btn-sm" data-action="export-rosa"><span data-ico="download" data-ico-size="14"></span>Esporta</button>
+      </div>
+    </div>
+    <div class="rosa-top">
+      <div class="card pitch-wrap reveal" style="--i:1">
+        <div class="pitch" id="pitchBoard"></div>
+        <div class="pitch-legend">
+          <span><i class="bg-roleP"></i>P</span><span><i class="bg-roleD"></i>D</span>
+          <span><i class="bg-roleC"></i>C</span><span><i class="bg-roleA"></i>A</span>
+          <span><i class="bg-warn"></i>Capitano</span>
+        </div>
+      </div>
+      <div class="card reveal" style="--i:2"><div class="card-h"><span class="ico" data-ico="target"></span><h3>Tactical board</h3></div>
+        <div class="card-b board-info" id="pitchInfo"></div></div>
+    </div>
+    <div class="rosa-grid reveal" style="--i:3" id="rosaGrid"></div>
+    <p class="formation-note reveal" style="--i:4"><span data-ico="info" data-ico-size="14"></span>Trascina (o usa le frecce) per le gerarchie: i primi di ogni ruolo sono i titolari del modulo e compaiono sul pitch. Clicca il prezzo per correggerlo. Ogni svincolo è annullabile.</p>
+    <div class="mt14 card reveal" style="--i:4"><div class="card-h"><span class="ico" data-ico="shield"></span><h3>Blocchi &amp; coppie</h3></div>
+      <div class="card-b"><div class="blocks-grid" id="blocksCard"></div></div></div>
+  </div>
+</section>
+
+<section id="regia" data-spy>
+  <div class="container">
+    <div class="sec-head reveal">
+      <div><div class="sec-eyebrow"><b>04</b><i></i>MOTORE DI RACCOMANDAZIONE</div><h2>REGIA <span>D'ASTA</span></h2></div>
+      <p class="sec-sub">Per ogni reparto: quanto ti serve, quanto puoi spendere, chi ti sta contendendo i giocatori e a che prezzo prenderli. Ricalcolato a ogni chiamata e a ogni movimento dei rivali.</p>
+    </div>
+    <div id="recRunBanner"></div>
+    <div class="card hot rec-best reveal" style="--i:1" id="recBest"></div>
+    <div class="rec-order reveal" style="--i:2" id="recOrder"></div>
+    <div class="rec-grid reveal" style="--i:3" id="recGrid"></div>
+    <div class="mt16 card reveal" style="--i:2">
+      <div class="card-h"><span class="ico" data-ico="sliders"></span><h3>Parametri del motore — applicati live</h3>
+        <button type="button" class="mla link-btn" data-action="rec-reset">Ripristina pesi</button></div>
+      <div class="card-b">
+        <div class="rec-ctrl">
+          <div class="rc-f"><div class="h"><label for="recAggr">Aggressività rilancio</label><output id="outAggr">1.00×</output></div>
+            <input type="range" id="recAggr" min="0.7" max="1.4" step="0.05" data-rec="aggression" aria-label="Aggressività del rilancio"></div>
+          <div class="rc-f"><div class="h"><label for="recUrg">Peso urgenza reparto</label><output id="outUrg">40%</output></div>
+            <input type="range" id="recUrg" min="0" max="100" step="5" data-rec="urgencyW" aria-label="Peso dell'urgenza di reparto"></div>
+          <div class="rc-f"><div class="h"><label for="recPress">Peso pressione rivali</label><output id="outPress">30%</output></div>
+            <input type="range" id="recPress" min="0" max="100" step="5" data-rec="pressureW" aria-label="Peso della pressione dei rivali"></div>
+          <div class="rc-f"><div class="h"><label for="recVal">Peso valore e affare</label><output id="outVal">30%</output></div>
+            <input type="range" id="recVal" min="0" max="100" step="5" data-rec="valueW" aria-label="Peso di valore e convenienza"></div>
+          <div class="rc-f"><div class="h"><label for="recBorrow">Prestito tra reparti</label><output id="outBorrow">50%</output></div>
+            <input type="range" id="recBorrow" min="0" max="100" step="5" data-rec="borrow" aria-label="Quota di budget prestabile"></div>
+          <div class="rc-f"><div class="h"><label for="recRun">Finestra run rivali</label><output id="outRun">6 chiamate</output></div>
+            <input type="range" id="recRun" min="3" max="15" step="1" data-rec="runWindow" aria-label="Chiamate recenti osservate"></div>
+          <div class="rc-f"><div class="h"><label for="recTop">Soglia indice «top»</label><output id="outTop">70</output></div>
+            <input type="range" id="recTop" min="45" max="95" step="5" data-rec="topThreshold" aria-label="Indice minimo top"></div>
+          <div class="rc-f"><div class="h"><label for="recDepth">Copertura panchina</label><output id="outDepth">2 riserve</output></div>
+            <input type="range" id="recDepth" min="0" max="4" step="1" data-rec="depthTarget" aria-label="Riserve desiderate"></div>
+        </div>
+        <div class="rec-presets">
+          <span class="lbl">Preset</span>
+          <button type="button" class="view-chip" data-action="rec-preset" data-p="prudente">Prudente</button>
+          <button type="button" class="view-chip" data-action="rec-preset" data-p="equilibrata">Equilibrata</button>
+          <button type="button" class="view-chip" data-action="rec-preset" data-p="aggressiva">Aggressiva</button>
+          <button type="button" class="view-chip" data-action="rec-preset" data-p="antiinflazione">Anti-inflazione</button>
+          <button type="button" class="view-chip" data-action="rec-preset" data-p="chiusura">Chiusura rosa</button>
+          <label class="mla toggle-inline"><span class="switch"><input type="checkbox" id="recBorrowOn" data-rec="borrowOn" aria-label="Prestito attivo"><span class="track"></span></span>Prestito attivo</label>
+        </div>
+        <p class="rec-note">I pesi sono normalizzati fra loro. L'aggressività moltiplica il prezzo consigliato ma non supera mai il tetto del reparto né il tetto globale della rosa.</p>
+      </div>
+    </div>
+    <div class="mt16 card reveal" style="--i:3">
+      <div class="card-h"><span class="ico" data-ico="info"></span><h3>Metodo — come nasce ogni suggerimento</h3></div>
+      <div class="card-b"><div class="method-grid" id="recMethod"></div>
+        <p class="rec-note">Nessun dato inventato: il motore usa solo ciò che è nel listone e ciò che è realmente accaduto a tabellone. I prezzi consigliati sono stime del modello, non garanzie d'asta.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="lega" data-spy>
+  <div class="container">
+    <div class="sec-head reveal">
+      <div><div class="sec-eyebrow"><b>05</b><i></i>SQUADRE, CONFRONTO, PRESSIONE</div><h2>LA <span>LEGA</span></h2></div>
+      <p class="sec-sub" id="legaSub"></p>
+    </div>
+    <div class="card reveal" style="--i:1">
+      <div class="card-h"><span class="ico" data-ico="users"></span><h3>Configurazione lega — nomi squadre</h3>
+        <button type="button" class="mla link-btn" data-action="reset-names">Svuota nomi</button></div>
+      <div class="card-b">
+        <div class="setup-top">
+          <div class="field"><label for="setupLeague">Nome lega</label><input type="text" class="inp" id="setupLeague" data-change="leagueName" maxlength="34" placeholder="Nome della lega"></div>
+          <div class="field"><label>Squadre partecipanti</label>
+            <div class="stepper"><button type="button" class="btn-icon" data-action="teams-step" data-d="-1" aria-label="Riduci squadre"><span data-ico="minus" data-ico-size="15"></span></button>
+              <span class="sv" id="setupCount">8</span>
+              <button type="button" class="btn-icon" data-action="teams-step" data-d="1" aria-label="Aumenta squadre"><span data-ico="plus" data-ico-size="15"></span></button>
+              <span class="fs11 c-faint">da 6 a 12</span></div></div>
+          <div class="field"><label for="setupBudget">Budget per squadra</label><input type="text" class="inp" id="setupBudget" data-change="budgetNum" inputmode="numeric"></div>
+        </div>
+        <div class="setup-grid" id="setupGrid"></div>
+        <p class="csv-note">I nomi si salvano mentre scrivi e si propagano a console, regia, tabellone, grafici e report. La squadra 1 sei tu.</p>
+      </div>
+    </div>
+    <div class="league-top">
+      <div class="card reveal" style="--i:1"><div class="card-h"><span class="ico" data-ico="chart"></span><h3>Corsa al budget</h3></div>
+        <div class="card-b" id="raceChart"></div></div>
+      <div class="card reveal" style="--i:2"><div class="card-h"><span class="ico" data-ico="radar"></span><h3>Radar — tu vs media</h3></div>
+        <div class="card-b"><div class="radar-legend"><span><i class="bg-neon"></i>La mia squadra</span><span><i class="bg-cyan"></i>Media avversari</span></div>
+        <div id="radarCard"></div></div></div>
+    </div>
+    <div class="teams-grid" id="teamsGrid"></div>
+    <div class="league-bottom">
+      <div class="card reveal" style="--i:1"><div class="card-h"><span class="ico" data-ico="flame"></span><h3>Pressione sui top</h3></div>
+        <div class="card-b" id="pressureCard"></div></div>
+      <div class="card reveal" style="--i:2"><div class="card-h"><span class="ico" data-ico="crown"></span><h3>Classifica di potenza</h3></div>
+        <div class="card-b" id="powerRank"></div></div>
+    </div>
+    <div class="league-bottom">
+      <div class="card reveal" style="--i:1"><div class="card-h"><span class="ico" data-ico="grid"></span><h3>Chi può permettersi i top</h3></div>
+        <div class="card-b"><div class="matrix-wrap" id="matrixCard"></div></div></div>
+      <div class="card reveal" style="--i:2"><div class="card-h"><span class="ico" data-ico="trend"></span><h3>Efficienza acquisti</h3></div>
+        <div class="card-b" id="scatterCard"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="analisi" data-spy>
+  <div class="container">
+    <div class="sec-head reveal">
+      <div><div class="sec-eyebrow"><b>06</b><i></i>REGOLE DEL TAVOLO E DIAGNOSTICA</div><h2>ANALISI &amp; <span>REGIA</span></h2></div>
+      <p class="sec-sub">Ogni parametro si applica all'istante su indice, prezzi equi, suggerimenti di reparto, equilibrio e proiezioni.</p>
+    </div>
+    <div class="analysis-grid">
+      <div class="card reveal" style="--i:1"><div class="card-h"><span class="ico" data-ico="sliders"></span><h3>Regole del tavolo</h3></div>
+        <div class="card-b">
+          <div class="setting-row"><div class="sr-head"><label><span data-ico="coin" data-ico-size="14"></span>Budget a squadra</label><output id="outBudget">500 cr</output></div>
+            <input type="range" id="setBudget" min="100" max="2000" step="10" data-set="budget" aria-label="Budget per squadra"></div>
+          <div class="setting-row"><div class="sr-head"><label><span data-ico="users" data-ico-size="14"></span>Squadre in lega</label><output id="outTeams">8</output></div>
+            <input type="range" id="setTeams" min="6" max="12" step="1" data-set="teams" aria-label="Numero di squadre"></div>
+          <div class="setting-row"><div class="sr-head"><label><span data-ico="shield" data-ico-size="14"></span>Riserva per slot libero</label><output id="outReserve">1 cr</output></div>
+            <input type="range" id="setReserve" min="1" max="5" step="1" data-set="reserve" aria-label="Riserva per slot libero"></div>
+          <div class="setting-row"><div class="sr-head"><label><span data-ico="chart" data-ico-size="14"></span>Ripartizione budget</label></div>
+            <div class="split-grid">
+              <div class="split-item"><label class="c-roleP">Portieri <output id="outSplitP">6%</output></label><input type="range" id="setSplitP" min="0" max="60" data-split="P" aria-label="Percentuale portieri"></div>
+              <div class="split-item"><label class="c-roleD">Difensori <output id="outSplitD">16%</output></label><input type="range" id="setSplitD" min="0" max="60" data-split="D" aria-label="Percentuale difensori"></div>
+              <div class="split-item"><label class="c-roleC">Centrocampisti <output id="outSplitC">30%</output></label><input type="range" id="setSplitC" min="0" max="60" data-split="C" aria-label="Percentuale centrocampisti"></div>
+              <div class="split-item"><label class="c-roleA">Attaccanti <output id="outSplitA">48%</output></label><input type="range" id="setSplitA" min="0" max="60" data-split="A" aria-label="Percentuale attaccanti"></div>
+            </div>
+            <div class="split-sum" id="splitSum"></div></div>
+          <div class="setting-row"><div class="settings-inline">
+            <div class="field"><label for="setStrategy">Rilancio base</label><select class="inp" id="setStrategy" data-change="strategy">
+              <option value="pr">Prudente −15%</option><option value="eq">Equilibrata</option><option value="ag">Aggressiva +15%</option></select></div>
+            <div class="field"><label for="setTimerSec">Timer chiamata</label><select class="inp" id="setTimerSec" data-change="timerSec">
+              <option value="15">15 secondi</option><option value="30">30 secondi</option><option value="45">45 secondi</option><option value="60">60 secondi</option></select></div>
+          </div>
+          <div class="flexwrap18 mt12">
+            <label class="toggle-inline"><span class="switch"><input type="checkbox" id="setTimerOn" data-change="timerOn" aria-label="Timer attivo"><span class="track"></span></span>Timer attivo</label>
+            <label class="toggle-inline" id="wakeRow"><span class="switch"><input type="checkbox" id="setWake" data-change="wakeLock" aria-label="Schermo sempre acceso"><span class="track"></span></span>Schermo sempre acceso</label>
+            <label class="toggle-inline"><span class="switch"><input type="checkbox" id="setTrend" data-change="trend" aria-label="Pesa il trend"><span class="track"></span></span>Pesa il trend</label>
+            <label class="toggle-inline"><span class="switch"><input type="checkbox" id="setConfirms" data-change="confirms" aria-label="Conferme di sicurezza"><span class="track"></span></span>Conferme di sicurezza</label>
+            <label class="toggle-inline"><span class="switch"><input type="checkbox" id="setPulse" data-change="hidePulse" aria-label="Mostra lo stato asta in dashboard"><span class="track"></span></span>Stato asta in dashboard</label>
+          </div></div>
+        </div></div>
+      <div>
+        <div class="mb14 card reveal" style="--i:2"><div class="card-h"><span class="ico" data-ico="scale"></span><h3>Equilibrio della rosa</h3></div>
+          <div class="card-b"><div class="gauge-wrap" id="gaugeCard"></div><div id="balancePanel"></div></div></div>
+        <div class="mb14 card reveal" style="--i:3"><div class="card-h"><span class="ico" data-ico="trend"></span><h3>Consumo budget &amp; proiezione</h3></div>
+          <div class="card-b" id="burndownCard"></div></div>
+        <div class="mb14 card reveal" style="--i:4"><div class="card-h"><span class="ico" data-ico="cloud"></span><h3>Sincronizzazione cloud</h3><span class="chip st-2" id="syncStateChip">non configurata</span></div>
+          <div class="card-b" id="syncBody"></div></div>
+        <div class="card reveal" style="--i:5"><div class="card-h"><span class="ico" data-ico="file"></span><h3>Dati &amp; backup</h3></div>
+          <div class="card-b"><div class="data-actions">
+            <button type="button" class="btn btn-ghost btn-sm" data-action="backup-now"><span data-ico="download" data-ico-size="14"></span>Backup JSON</button>
+            <button type="button" class="btn btn-gold btn-sm hidden" id="installBtn" data-action="install-app"><span data-ico="download" data-ico-size="14"></span>Installa app</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="import-json"><span data-ico="upload" data-ico-size="14"></span>Importa backup</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="print"><span data-ico="file" data-ico-size="14"></span>Report</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="cheat-print"><span data-ico="grid" data-ico-size="14"></span>Cheat sheet</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="league-report"><span data-ico="crown" data-ico-size="14"></span>Report finale</button>
+            <button type="button" class="btn btn-flare btn-sm" data-action="reset-asta"><span data-ico="undo" data-ico-size="14"></span>Azzera asta</button>
+            <button type="button" class="btn btn-flare btn-sm" data-action="reset-all"><span data-ico="trash" data-ico-size="14"></span>Cancella tutto</button></div>
+            <input type="file" id="importFile" accept=".json,application/json" class="sr-only" aria-label="File di backup JSON">
+            <p class="csv-note" id="dataNote"></p></div></div>
+      </div>
+    </div>
+    <div class="card reveal" style="--i:2"><div class="card-h"><span class="ico" data-ico="sparkles"></span><h3>Diagnostica del regista</h3></div>
+      <div class="card-b"><div class="tips-grid" id="tipsList"></div></div></div>
+  </div>
+</section>
+
+<section id="sistema" data-spy>
+  <div class="container">
+    <div class="sec-head reveal">
+      <div><div class="sec-eyebrow"><b>07</b><i></i>AFFIDABILITÀ E RECUPERO</div><h2>SISTEMA &amp; <span>SICUREZZA</span></h2></div>
+      <p class="sec-sub">Tutto ciò che protegge l'asta: doppio salvataggio con verifica, snapshot ripristinabili, controllo di coerenza del tabellone e backup su file. Nessun dato lascia il tuo dispositivo.</p>
+    </div>
+
+    <div class="mb16 card reveal" style="--i:1">
+      <div class="card-h"><span class="ico" data-ico="check"></span><h3>Checklist pre-asta</h3>
+        <span class="mla chip st-2" id="checkCount">0/7</span></div>
+      <div class="card-b"><div class="check-list" id="checkList"></div></div>
+    </div>
+
+    <div class="sys-grid">
+      <div class="card reveal" style="--i:2" id="auditCard">
+        <div class="card-h"><span class="ico" data-ico="shield"></span><h3>Audit di coerenza</h3>
+          <button type="button" class="mla link-btn" data-action="audit-run">Riesegui</button></div>
+        <div class="audit-sum" id="auditSummary"></div>
+        <div class="card-b" id="auditList"></div>
+      </div>
+      <div>
+        <div class="mb14 card reveal" style="--i:3">
+          <div class="card-h"><span class="ico" data-ico="history"></span><h3>Time machine</h3>
+            <span class="mla chip st-2" id="snapCount">0</span></div>
+          <div class="card-b"><div class="snap-list" id="snapList"></div>
+            <p class="csv-note">Ogni acquisto, svincolo o import crea uno snapshot locale. Ripristinare è sempre annullabile: non perdi mai il punto in cui eri.</p></div>
+        </div>
+        <div class="mb14 card reveal" style="--i:4">
+          <div class="card-h"><span class="ico" data-ico="download"></span><h3>Backup su file</h3></div>
+          <div class="card-b">
+            <div class="kv"><span>Ultimo backup scaricato</span><b id="lastBackup">mai</b></div>
+            <div class="kv"><span>Acquisti dall'ultimo backup</span><b id="sinceBackup">0</b></div>
+            <div class="flexwrap16 mv12">
+              <label class="toggle-inline"><span class="switch"><input type="checkbox" id="setAutoBackup" data-change="autoBackup" aria-label="Backup automatico"><span class="track"></span></span>Backup automatico</label>
+              <div class="mw150 field"><label for="setAutoEvery">Ogni N acquisti</label>
+                <select class="inp" id="setAutoEvery" data-change="autoBackupEvery">
+                  <option value="5">5</option><option value="10">10</option><option value="12">12</option><option value="20">20</option><option value="30">30</option></select></div>
+            </div>
+            <div class="data-actions">
+              <button type="button" class="btn btn-gold btn-sm" data-action="backup-now"><span data-ico="download" data-ico-size="14"></span>Scarica backup ora</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-action="import-json"><span data-ico="upload" data-ico-size="14"></span>Ripristina da file</button>
+            </div>
+            <p class="csv-note">Il backup contiene listone, rose, prezzi, radar, impostazioni e log: ricaricandolo su qualsiasi dispositivo riprendi l'asta esattamente da lì.</p>
+          </div>
+        </div>
+        <div class="card reveal" style="--i:5">
+          <div class="card-h"><span class="ico" data-ico="lock"></span><h3>Sessione &amp; memoria</h3></div>
+          <div class="card-b">
+            <div class="kv"><span>Salvataggio</span><b id="storeMode">doppio + verifica</b></div>
+            <div class="kv"><span>Schede aperte su questa asta</span><b id="peerCount">1</b></div>
+            <div class="kv"><span>Ultimo salvataggio</span><b id="lastSave">—</b></div>
+            <div class="mt12 lbl">Spazio browser usato</div>
+            <div class="storage-bar" id="storageBar"><i class="w0"></i></div>
+            <div class="bn kv"><span id="storageTxt">—</span><b id="storagePct">0%</b></div>
+            <div class="mt10 data-actions">
+              <button type="button" class="btn btn-ghost btn-sm" data-action="reload-store"><span data-ico="undo" data-ico-size="14"></span>Ricarica da memoria</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-action="prune-snaps"><span data-ico="trash" data-ico-size="14"></span>Libera snapshot vecchi</button>
+              <button type="button" class="btn btn-flare btn-sm" data-action="reset-all"><span data-ico="trash" data-ico-size="14"></span>Cancella tutto e riparti puliti</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<div id="cheatSheet" aria-hidden="true"></div>
+<div id="leagueReport" aria-hidden="true"></div>
+
+<footer aria-label="Informazioni sull'applicazione"><div class="container foot-in">
+  <p><b class="c-neon">ASTA MAESTRA</b> — console d'asta a prova di errore. Salvataggio ridondante, snapshot, audit e backup: il listone è solo il tuo e nulla lascia il browser.</p>
+  <div class="shortcuts"><span><kbd>/</kbd> chiama</span><span><kbd>1-9</kbd> squadra</span><span><kbd>←→</kbd> prezzo</span><span><kbd>Invio</kbd> aggiudica</span><span><kbd>Ctrl+Z</kbd> annulla</span><span><kbd>Ctrl+S</kbd> backup</span></div>
+</div></footer>
+
+<div class="scrim" id="drawerScrim" data-action="drawer-close"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-label="Scheda giocatore">
+  <div class="drawer-head" id="drawerHead"></div><div class="drawer-body" id="drawerBody"></div>
+</aside>
+<div class="present" id="presentMode" role="dialog" aria-modal="true" aria-label="Modalità presentazione" hidden>
+  <header class="present-head">
+    <div class="present-brand"><span data-ico="gavel" data-ico-size="28"></span>
+      <div><b id="presentLeague">ASTA LIVE</b><small>TACTICAL CONSOLE · PROIEZIONE</small></div></div>
+    <div class="present-clock"><span id="presentClock">--:--</span><small>ORA</small></div>
+    <button type="button" class="btn-icon" id="presentThemeBtn" data-action="present-theme" aria-label="Attiva il tema chiaro" title="Tema chiaro / scuro"><span data-ico="sparkles" data-ico-size="16"></span></button>
+    <button type="button" class="btn btn-ghost" data-action="present-toggle">Esci <kbd>P</kbd></button>
+  </header>
+  <div class="present-body">
+    <section class="present-side"><h3><span data-ico="crown" data-ico-size="14"></span> CLASSIFICA · BUDGET</h3><div id="presentTeams"></div></section>
+    <section class="present-main" id="presentCall"></section>
+    <section class="present-side"><h3><span data-ico="radar" data-ico-size="14"></span> CONSIGLI · REGIA</h3><div id="presentRec"></div></section>
+  </div>
+  <footer class="present-foot" aria-label="Scorciatoie della presentazione"><span><kbd>P</kbd> esci</span><span><kbd>T</kbd> timer</span><span><kbd>/</kbd> cerca</span><span><kbd>Invio</kbd> aggiudica</span></footer>
+</div>
+<div class="modal-wrap" id="modalWrap"><div class="scrim" data-action="modal-cancel"></div>
+  <div class="card modal-card" id="modalCard" role="dialog" aria-modal="true"></div></div>
+<div id="toasts" role="status" aria-live="polite"></div>
+<div id="fx"></div>
+<div class="sr-only" id="liveRegion" aria-live="assertive"></div>
+
+<script type="module" src="/src/app.js"></script>
+</body>
+</html>

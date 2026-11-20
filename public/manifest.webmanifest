@@ -1,0 +1,23 @@
+{
+  "name": "Asta Maestra — Console fantacalcio",
+  "short_name": "Asta Maestra",
+  "description": "Console d'asta per il fantacalcio: listone, regia, budget, audit e backup.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080C14",
+  "theme_color": "#080C14",
+  "lang": "it",
+  "dir": "ltr",
+  "categories": ["sports", "productivity"],
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Console d'asta", "short_name": "Console", "url": "./#console" },
+    { "name": "Regia", "short_name": "Regia", "url": "./#regia" }
+  ]
+}

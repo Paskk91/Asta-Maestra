@@ -1,0 +1,21 @@
+{
+  "name": "asta-maestra",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Console d'asta per il fantacalcio — PWA con sync Supabase opzionale",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.4"
+  },
+  "devDependencies": {
+    "css-tree": "^3.2.1",
+    "jsdom": "^31.0.1",
+    "vite": "^6.2.0"
+  }
+}
