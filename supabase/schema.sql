@@ -54,15 +54,15 @@ begin
     raise exception 'Utente non autenticato';
   end if;
 
-  insert into public.asta_sessions (user_id, data, revision, device, updated_at)
+  insert into public.asta_sessions as s (user_id, data, revision, device, updated_at)
   values (v_uid, p_data, p_revision, p_device, now())
   on conflict (user_id) do update
     set data = excluded.data,
         revision = excluded.revision,
         device = excluded.device,
         updated_at = now()
-    where excluded.revision > public.asta_sessions.revision
-  returning * into v_row;
+    where excluded.revision > s.revision
+  returning s.* into v_row;
 
   if v_row.id is null then
     select * into v_row from public.asta_sessions where user_id = v_uid;

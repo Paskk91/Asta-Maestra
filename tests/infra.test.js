@@ -14,7 +14,7 @@ test('schema Supabase: RLS, upsert con revisione e privilegi', () => {
   assert.match(sql, /enable row level security/);
   assert.match(sql, /\(select auth\.uid\(\)\) = user_id/);
   assert.match(sql, /on conflict \(user_id\) do update/);
-  assert.match(sql, /where excluded\.revision > public\.asta_sessions\.revision/);
+  assert.match(sql, /where excluded\.revision > s\.revision/);
   assert.match(sql, /grant execute on function public\.asta_sync_push/);
   assert.match(sql, /revoke all on function public\.asta_sync_push.*anon/i);
 });
